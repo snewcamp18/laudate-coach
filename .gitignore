@@ -1,0 +1,5 @@
+.DS_Store
+# The Laudate Playbook stays private: it's uploaded to the team space from the owner's computer (see SETUP.md).
+library.js
+playbook.md
+.claude/

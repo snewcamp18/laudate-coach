@@ -1,0 +1,47 @@
+rules_version = '2';
+// Laudate Coach database rules.
+//  - Everything lives under team/laudate. Only signed-in people with a verified email on that document's
+//    owners or coaches list can read or write it. Member records hold personal details, so nobody else can.
+//  - Owners can change the coach list from the app; the owners list itself can only be changed in the
+//    Firebase console.
+//  - Records must have the shape the app writes and say who wrote them. Nothing can be hard-deleted from
+//    the app; deletions are written as tombstones so every device learns about them.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function email() { return request.auth.token.email.lower(); }
+    function verified() {
+      return request.auth != null && request.auth.token.email != null && request.auth.token.email_verified == true;
+    }
+    function team() { return get(/databases/$(database)/documents/team/laudate).data; }
+    function isOwner() { return verified() && email() in team().owners; }
+    function isCoach() { return verified() && (email() in team().owners || email() in team().coaches); }
+    function knownCollection(col) { return col in ['classes', 'members', 'elements', 'overrides', 'settings']; }
+
+    function validRecord(d) {
+      return d.keys().hasOnly(['updated', 'deleted', 'by', 'data'])
+        && d.updated is number && d.deleted is bool
+        && d.by == email()
+        && (d.deleted ? d.data == null : d.data is map);
+    }
+
+    match /team/laudate {
+      allow get: if isCoach();
+      allow update: if isOwner()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['coaches'])
+        && request.resource.data.coaches is list
+        && request.resource.data.coaches.size() <= 200;
+
+      // the playbook library: every coach reads it, only owners upload it
+      match /playbook/{id} {
+        allow read: if isCoach();
+        allow create, update: if isOwner() && id == 'current' && validRecord(request.resource.data);
+      }
+
+      match /{col}/{id} {
+        allow read: if knownCollection(col) && isCoach();
+        allow create, update: if knownCollection(col) && isCoach() && id.size() <= 64 && validRecord(request.resource.data);
+      }
+    }
+  }
+}
