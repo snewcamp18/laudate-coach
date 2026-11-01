@@ -111,7 +111,7 @@ function cleanText(s) {
     .replace(/\\-/g, '-').replace(/\\_/g, '_').replace(/\\\./g, '.').replace(/\\\\/g, '').replace(/\\([^\w\s])/g, '$1');
   s = s.replace(/\*\*|__/g, '');
   s = s.replace(/(^|[^\w])\*(?!\s)([^*]+?)\*(?!\w)/g, '$1$2');
-  s = s.replace(/ /g, ' ');
+  s = s.replace(/\u00a0/g, ' ');
   return s.replace(/\s+/g, ' ').trim();
 }
 
