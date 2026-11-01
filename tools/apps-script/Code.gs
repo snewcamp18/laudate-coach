@@ -180,9 +180,9 @@ function parsePlaybook(md) {
     const h = head.trim().replace(/[-–:\s]+$/, '').trim();
     const rm = h.match(REF_ANY), ref = rm ? rm[1].trim() : '';
     let variant = '';
-    const vm = h.match(/[-–]?\s*(Al\w*nat\w*|Alt\.?)(\s*#?\d+)?/i);
+    const vm = h.match(/[-–]?\s*\b(Al\w*nat\w*|Alt\b\.?)(\s*#?\d+)?/i);
     if (vm) variant = 'Alternative' + (/\d/.test(vm[0]) ? ' ' + vm[0].replace(/\D/g, '') : '');
-    let name = h.replace(/\([^)]*\)/g, '').replace(/[-–]?\s*(Al\w*nat\w*|Alt\.?)\s*#?\d*/gi, ' ').replace(/\s+/g, ' ');
+    let name = h.replace(/\([^)]*\)/g, '').replace(/[-–]?\s*\b(Al\w*nat\w*|Alt\b\.?)\s*#?\d*/gi, ' ').replace(/\s+/g, ' ');
     name = name.trim().replace(/[-–:]\s*$/, '').replace(/^[\s\-–:]+|[\s\-–:]+$/g, '');
     const notes = (h.match(/\(([^)]*)\)/g) || []).map(x => x.slice(1, -1).trim()).filter(x => !REF_ANY.test(x));
     return { name: name || h, ref, variant, notes };

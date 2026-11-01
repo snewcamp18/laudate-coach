@@ -94,11 +94,11 @@ def parse_head(head):
     if m:
         ref = m.group(1).strip()
     variant = ''
-    vm = re.search(r'[-–]?\s*(Al\w*nat\w*|Alt\.?)(\s*#?\d+)?', h, re.I)
+    vm = re.search(r'[-–]?\s*\b(Al\w*nat\w*|Alt\b\.?)(\s*#?\d+)?', h, re.I)
     if vm:
         variant = 'Alternative' + ((' ' + re.sub(r'\D', '', vm.group(0))) if re.search(r'\d', vm.group(0)) else '')
     name = re.sub(r'\([^)]*\)', '', h)
-    name = re.sub(r'[-–]?\s*(Al\w*nat\w*|Alt\.?)\s*#?\d*', ' ', name, flags=re.I)
+    name = re.sub(r'[-–]?\s*\b(Al\w*nat\w*|Alt\b\.?)\s*#?\d*', ' ', name, flags=re.I)
     name = re.sub(r'\s+', ' ', name)
     name = re.sub(r'[-–:]\s*$', '', name.strip()).strip(' -–:')
     extra = [x.strip() for x in re.findall(r'\(([^)]*)\)', h) if not REF_ANY.search(x)]
