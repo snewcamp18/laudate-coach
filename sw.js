@@ -1,6 +1,6 @@
 // Offline support. App files load from the network when it answers quickly (so updates show up
 // right away) and from this cache otherwise.
-const CACHE = 'laudate-coach-v3';
+const CACHE = 'laudate-coach-v4';
 const CORE = ['./', 'index.html', 'app.js', 'sync.js', 'firebase-config.js', 'manifest.webmanifest',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
 

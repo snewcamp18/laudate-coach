@@ -38,7 +38,7 @@
 
   let A = null, F = null, auth = null, fs = null, user = null, unsubs = [];
   let state = 'loading', detail = '', team = null, queue = Promise.resolve(), pushTimer = null;
-  let cloudLib = undefined; // { updated, sig } of the team's playbook; null if none uploaded yet
+  let cloudLib = undefined; // { updated, sig, source, docModified } of the team's playbook; null if none uploaded yet
   // short fingerprint of a playbook, to tell whether the copy on this computer differs from the team's
   const sig = lib => { const t = JSON.stringify(lib); let h = 2166136261; for (let i = 0; i < t.length; i++) h = Math.imul(h ^ t.charCodeAt(i), 16777619); return (h >>> 0).toString(36) + '-' + t.length };
   // Per-person sync bookkeeping, kept in localStorage: what each record looked like when it last matched the cloud.
@@ -117,8 +117,10 @@
     unsubs.push(unsubTeam);
     unsubs.push(F.onSnapshot(docRef('playbook', 'current'), s => {
       const r = s.exists() ? s.data() : null;
-      cloudLib = r && !r.deleted ? { updated: r.updated, sig: r.data.sig } : null;
-      if (cloudLib && (cachedLibrary()?.updated || 0) < r.updated) { setLibrary(r.data.lib, r.updated); toast('Playbook loaded') }
+      cloudLib = r && !r.deleted ? { updated: r.updated, sig: r.data.sig, source: r.data.source, docModified: r.data.docModified } : null;
+      const had = cachedLibrary()?.updated;
+      // a version made from the Google Doc is always the newest, so it also replaces library.js on the owner's computer
+      if (cloudLib && (had || 0) < r.updated) { setLibrary(r.data.lib, r.updated, cloudLib.source === 'google-doc'); toast(had ? 'Playbook updated' : 'Playbook loaded') }
       refresh();
     }, () => {}));
     for (const col of Object.keys(COLS)) {
@@ -241,6 +243,7 @@
   // Owners with library.js on their computer can upload it (or a newer version) for the whole team.
   function playbookHTML() {
     if (cloudLib === undefined || !team) return '';
+    if (cloudLib && cloudLib.source === 'google-doc') return `<div class="divider"></div><p class="small muted">The playbook updates automatically from the Laudate Playbook Google Doc${cloudLib.docModified ? ` (last edited ${new Date(cloudLib.docModified).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })})` : ''}.</p>`;
     const local = window.LAUDATE_LIBRARY;
     if (!isOwner() || !local) return cloudLib ? '' : `<div class="divider"></div><p class="small muted">The team’s playbook hasn’t been uploaded yet. An owner uploads it from their computer.</p>`;
     if (cloudLib && cloudLib.sig === sig(local)) return `<div class="divider"></div><p class="small muted">The team has the same playbook as this computer (${local.elements.length} elements).</p>`;

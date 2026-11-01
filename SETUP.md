@@ -35,12 +35,11 @@ The values in `firebase-config.js` identify your project; they aren't secrets. W
 anything, which matters because member records hold names, phone numbers and notes. Whenever `firestore.rules`
 changes, paste the new version into **Firestore Database → Rules** and click **Publish**.
 
-**Uploading the playbook (once, and again whenever the playbook changes).** The Laudate Playbook is not in the
-published code, so it stays private to coaches. On the computer that has `library.js` (this folder), run the app
-locally (`python3 -m http.server 8766`, then open <http://localhost:8766>), sign in under **More → Team sync** as an
-owner, and tap **Upload the playbook**. Every coach's device downloads it when they sign in and keeps a copy for
-offline use. To refresh it after editing the playbook doc, regenerate `library.js` (see README) and tap
-**Update the team's playbook**.
+**Getting the playbook to coaches.** The Laudate Playbook is not in the published code, so it stays private to
+coaches. Set up the automatic updater in `tools/apps-script/README.md` (about 5 minutes, once): it uploads the
+playbook from the Google Doc into the team space and keeps it up to date within an hour of each edit. Every coach's
+device downloads it when they sign in and keeps a copy for offline use. (Without the updater, an owner can upload
+`library.js` by hand from a local copy of the app under **More → Team sync**.)
 
 **Adding a coach.** Open the app, go to **More → Team sync**, sign in, and type the coach's email under **Coaches**.
 They then open the app, go to **More → Team sync** and sign in with Google, or create an account with that email
@@ -89,5 +88,6 @@ open with an internet connection.
 | `sync.js` | Sign-in and team sync |
 | `firebase-config.js` | Your Firebase project settings (`null` = sync off) |
 | `firestore.rules` | Database security rules to paste into Firebase |
+| `tools/apps-script/` | Automatic playbook updates from the Google Doc |
 | `sw.js` | Offline support |
 | `manifest.webmanifest`, `icons/` | What lets phones and computers install it as an app |

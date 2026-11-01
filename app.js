@@ -7,11 +7,12 @@ const KEY = 'laudate-coach-v1';
  * the team space once a coach signs in (sync.js), and is cached on each device so it works offline. */
 const LIB_KEY = 'laudate-library';
 const EMPTY_LIB = { elements: [], equipment: {}, structure: [], breathGuide: [] };
-let LIB = window.LAUDATE_LIBRARY || cachedLibrary()?.lib || EMPTY_LIB;
+// A cached copy made from the Google Doc (auto) is newer than any library.js file.
+let LIB = (cachedLibrary()?.auto && cachedLibrary().lib) || window.LAUDATE_LIBRARY || cachedLibrary()?.lib || EMPTY_LIB;
 function cachedLibrary() { try { return JSON.parse(localStorage.getItem(LIB_KEY)) } catch (e) { return null } }
-function setLibrary(lib, updated) {
-  try { localStorage.setItem(LIB_KEY, JSON.stringify({ updated, lib })) } catch (e) {}
-  if (!window.LAUDATE_LIBRARY) { LIB = lib; dirtyLib() }
+function setLibrary(lib, updated, overLocal) {
+  try { localStorage.setItem(LIB_KEY, JSON.stringify({ updated, lib, auto: !!overLocal })) } catch (e) {}
+  if (!window.LAUDATE_LIBRARY || overLocal) { LIB = lib; dirtyLib() }
 }
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];

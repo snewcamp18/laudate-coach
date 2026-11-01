@@ -34,6 +34,9 @@ Then open <http://localhost:8766>.
 
 ## Updating the library from the playbook
 
+The team's copy updates by itself from the Google Doc once `tools/apps-script` is set up (see its README). To rebuild
+the local `library.js` too:
+
 `library.js` is generated from the Laudate Playbook Google Doc. Export the doc as Markdown, then:
 
 ```bash
@@ -52,5 +55,6 @@ off the public site; coaches get the playbook from the team space after an owner
 | `library.js` | Playbook elements (generated, private — not in git) |
 | `sync.js`, `firebase-config.js`, `firestore.rules` | Coach sign-in and team sync |
 | `tools/parse_playbook.py` | Builds `library.js` from the playbook |
+| `tools/apps-script/` | Keeps the team's playbook updated from the Google Doc |
 | `sw.js` | Offline support |
 | `manifest.webmanifest`, `icons/` | Lets phones install it as an app |
